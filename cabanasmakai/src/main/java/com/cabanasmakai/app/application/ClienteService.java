@@ -2,8 +2,12 @@ package com.cabanasmakai.app.application;
 
 import com.cabanasmakai.app.adapters.persistence.ClienteRepository;
 import com.cabanasmakai.app.domain.Cliente;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +36,10 @@ public class ClienteService {
 
     @Transactional
     public void deletarCliente(Long id) {
-       clienteRepository.deleteById(id);
+        if (!clienteRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Cliente não encontrado com id: " + id);
+        }
+        clienteRepository.deleteById(id);
     }
 }

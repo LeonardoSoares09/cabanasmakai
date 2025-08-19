@@ -6,6 +6,7 @@ import com.cabanasmakai.app.application.ClienteService;
 import com.cabanasmakai.app.domain.Cliente;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -13,6 +14,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/clientes")
@@ -37,8 +39,13 @@ public class ClienteController {
     }
 
     @GetMapping
-    public List<Cliente> listarClientes() {
-        return clienteService.listarClientes();
+    public ResponseEntity<List<ClienteDTO>> listarClientes() {
+        List<ClienteDTO> clientes = clienteService.listarClientes()
+                .stream()
+                .map(clienteMapper::toDto)
+                .toList();
+
+        return ResponseEntity.ok(clientes);
     }
 
     @GetMapping("/{id}")
@@ -46,5 +53,11 @@ public class ClienteController {
         return clienteService.buscarClientePorId(id).
                 map(cliente -> ResponseEntity.ok(clienteMapper.toDto(cliente))).
                 orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletarCliente(@PathVariable Long id) {
+        clienteService.deletarCliente(id);
     }
 }

@@ -1,6 +1,7 @@
 package com.cabanasmakai.app.adapters.rest.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -35,10 +36,11 @@ public class ClienteDTO {
     @NotNull(message = "Data de saída é obrigatória")
     private LocalDate dataSaida;
 
+    @AssertTrue(message = "dataSaida deve ser depois de dataEntrada")
     public boolean isPeriodoValido(){
         if(dataEntrada == null || dataSaida == null){
             return true;
         }
-        return !dataSaida.isEqual(dataEntrada);
+        return !dataSaida.isBefore(dataEntrada);
     }
 }
