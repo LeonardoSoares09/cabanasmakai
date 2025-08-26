@@ -10,11 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/clientes")
@@ -59,5 +56,13 @@ public class ClienteController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletarCliente(@PathVariable Long id) {
         clienteService.deletarCliente(id);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ClienteDTO> editarCliente(@PathVariable Long id, @RequestBody @Valid ClienteDTO clienteDTO) {
+        Cliente cliente = clienteMapper.toEntity(clienteDTO);
+        cliente.setId(id);
+        Cliente atualizado = clienteService.editarCliente(cliente);
+        return ResponseEntity.ok(clienteMapper.toDto(atualizado));
     }
 }

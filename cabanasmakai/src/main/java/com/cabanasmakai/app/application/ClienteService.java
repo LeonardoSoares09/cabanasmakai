@@ -2,12 +2,9 @@ package com.cabanasmakai.app.application;
 
 import com.cabanasmakai.app.adapters.persistence.ClienteRepository;
 import com.cabanasmakai.app.domain.Cliente;
-import jakarta.persistence.EntityNotFoundException;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.HttpStatus;
+import com.cabanasmakai.app.exceptions.ClienteNaoEncontradoException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,9 +34,26 @@ public class ClienteService {
     @Transactional
     public void deletarCliente(Long id) {
         if (!clienteRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "Cliente não encontrado com id: " + id);
+            throw new ClienteNaoEncontradoException(id);
         }
         clienteRepository.deleteById(id);
+    }
+
+    @Transactional
+    public Cliente editarCliente(Cliente cliente) {
+        Optional<Cliente> clienteOptional = clienteRepository.findById(cliente.getId());
+        if(clienteOptional.isEmpty()) {
+            throw new ClienteNaoEncontradoException(cliente.getId());
+        }
+
+        Cliente clienteAtualizado = clienteOptional.get();
+        clienteAtualizado.setNome(cliente.getNome());
+        clienteAtualizado.setEmail(cliente.getEmail());
+        clienteAtualizado.setTelefone(cliente.getTelefone());
+        clienteAtualizado.setCpf(cliente.getCpf());
+        clienteAtualizado.setCidade(cliente.getCidade());
+        clienteAtualizado.setDataEntrada(cliente.getDataEntrada());
+        clienteAtualizado.setDataSaida(cliente.getDataSaida());
+        return clienteRepository.save(clienteAtualizado);
     }
 }
