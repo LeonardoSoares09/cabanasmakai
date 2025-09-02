@@ -27,8 +27,8 @@ public class ClienteService {
         return clienteRepository.findAll();
     }
 
-    public Optional<Cliente> buscarClientePorId(Long id) {
-        return clienteRepository.findById(id);
+    public Cliente buscarClientePorId(Long id) {
+        return clienteRepository.findById(id).orElseThrow(() -> new ClienteNaoEncontradoException(id));
     }
 
     @Transactional

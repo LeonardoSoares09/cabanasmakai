@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -30,17 +31,27 @@ public class CabanaService {
 
     @Transactional
     public Cabanas adicionarCabana(Cabanas cabana){
-        cabana.setStatusCabana(StatusCabana.DISPONIVEL);
         return cabanaRepository.save(cabana);
     }
 
     @Transactional
     public Cabanas atualizarCabana(Cabanas cabana){
-        Cabanas cabanaExistente = cabanaRepository.findById(cabana.getId())
-                .orElseThrow(() -> new CabanaNaoEncontradaException(cabana.getId()));
+        Optional<Cabanas> cabanaExistente = cabanaRepository.findById(cabana.getId());
+        if(cabanaExistente.isEmpty()){
+            throw new CabanaNaoEncontradaException(cabana.getId());
+        }
 
-        cabanaExistente.setNumeroCabana(cabana.getNumeroCabana());
-        return cabanaRepository.save(cabanaExistente);
+        Cabanas cabanaEditada = cabanaExistente.get();
+
+        if(cabana.getStatusCabana() != null){
+            cabanaEditada.setStatusCabana(cabana.getStatusCabana());
+        }
+
+        if(cabana.getNumeroCabana() != null){
+            cabanaEditada.setNumeroCabana(cabana.getNumeroCabana());
+        }
+
+        return cabanaRepository.save(cabanaEditada);
     }
 
     @Transactional
@@ -95,5 +106,13 @@ public class CabanaService {
         cabanaRepository.save(cabana);
 
         return cabana;
+    }
+
+    public List<Cabanas> listarCabanas() {
+        return cabanaRepository.findAll();
+    }
+
+    public Cabanas listarCabanaId(Long id) {
+        return cabanaRepository.findById(id).orElseThrow(() -> new CabanaNaoEncontradaException(id));
     }
 }

@@ -47,9 +47,8 @@ public class ClienteController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ClienteEditadoResponse> buscarClientePorId(@PathVariable Long id) {
-        return clienteService.buscarClientePorId(id).
-                map(cliente -> ResponseEntity.ok(clienteMapper.toDto(cliente))).
-                orElse(ResponseEntity.notFound().build());
+        Cliente cliente = clienteService.buscarClientePorId(id);
+        return ResponseEntity.ok(clienteMapper.toDto(cliente));
     }
 
     @DeleteMapping("/{id}")
