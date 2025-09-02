@@ -1,6 +1,7 @@
 package com.cabanasmakai.app.adapters.rest;
 
-import com.cabanasmakai.app.adapters.rest.dto.ClienteDTO;
+import com.cabanasmakai.app.adapters.rest.dto.request.ClienteRequest;
+import com.cabanasmakai.app.adapters.rest.dto.response.ClienteEditadoResponse;
 import com.cabanasmakai.app.adapters.rest.mapper.ClienteMapper;
 import com.cabanasmakai.app.application.ClienteService;
 import com.cabanasmakai.app.domain.Cliente;
@@ -22,22 +23,21 @@ public class ClienteController {
     private final ClienteMapper clienteMapper;
 
     @PostMapping
-    public ResponseEntity<ClienteDTO> criar(@RequestBody @Valid ClienteDTO clienteDTO) {
-        Cliente cliente = clienteMapper.toEntity(clienteDTO);
-        Cliente salvo = clienteService.criarCliente(cliente);
+    public ResponseEntity<ClienteEditadoResponse> criar(@RequestBody @Valid ClienteRequest clienteRequest) {
+        Cliente cliente = clienteService.criarCliente(clienteMapper.toEntity(clienteRequest));
 
         URI location = ServletUriComponentsBuilder.
                 fromCurrentRequest().
                 path("/{id}").
-                buildAndExpand(salvo.getId()).
+                buildAndExpand(cliente.getId()).
                 toUri();
 
-        return ResponseEntity.created(location).body(clienteMapper.toDto(salvo));
+        return ResponseEntity.created(location).body(clienteMapper.toDto(cliente));
     }
 
     @GetMapping
-    public ResponseEntity<List<ClienteDTO>> listarClientes() {
-        List<ClienteDTO> clientes = clienteService.listarClientes()
+    public ResponseEntity<List<ClienteEditadoResponse>> listarClientes() {
+        List<ClienteEditadoResponse> clientes = clienteService.listarClientes()
                 .stream()
                 .map(clienteMapper::toDto)
                 .toList();
@@ -46,7 +46,7 @@ public class ClienteController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ClienteDTO> buscarClientePorId(@PathVariable Long id) {
+    public ResponseEntity<ClienteEditadoResponse> buscarClientePorId(@PathVariable Long id) {
         return clienteService.buscarClientePorId(id).
                 map(cliente -> ResponseEntity.ok(clienteMapper.toDto(cliente))).
                 orElse(ResponseEntity.notFound().build());
@@ -58,11 +58,12 @@ public class ClienteController {
         clienteService.deletarCliente(id);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ClienteDTO> editarCliente(@PathVariable Long id, @RequestBody @Valid ClienteDTO clienteDTO) {
+    @PatchMapping("/{id}")
+    public ResponseEntity<ClienteEditadoResponse> editarCliente(@PathVariable Long id, @RequestBody ClienteRequest clienteDTO) {
+
         Cliente cliente = clienteMapper.toEntity(clienteDTO);
         cliente.setId(id);
-        Cliente atualizado = clienteService.editarCliente(cliente);
-        return ResponseEntity.ok(clienteMapper.toDto(atualizado));
+        cliente = clienteService.editaCliente(cliente);
+        return ResponseEntity.ok(clienteMapper.toDto(cliente));
     }
 }

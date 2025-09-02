@@ -1,16 +1,10 @@
-package com.cabanasmakai.app.adapters.rest.dto.response;
+package com.cabanasmakai.app.adapters.rest.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
-import java.time.LocalDate;
-
 @Data
-public class ClienteDTO {
-
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Long id;
+public class ClienteRequest {
 
     @NotBlank(message = "Nome é obrigatório")
     @NotNull

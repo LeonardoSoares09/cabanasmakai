@@ -26,6 +26,4 @@ public class Cliente {
     private String email;
     @Pattern(regexp = "\\d{11}", message = "CPF deve ter 11 dígitos")
     private String cpf;
-    private LocalDate dataEntrada;
-    private LocalDate dataSaida;
 }

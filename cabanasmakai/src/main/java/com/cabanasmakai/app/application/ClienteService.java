@@ -40,20 +40,34 @@ public class ClienteService {
     }
 
     @Transactional
-    public Cliente editarCliente(Cliente cliente) {
+    public Cliente editaCliente (Cliente cliente) {
         Optional<Cliente> clienteOptional = clienteRepository.findById(cliente.getId());
         if(clienteOptional.isEmpty()) {
             throw new ClienteNaoEncontradoException(cliente.getId());
         }
 
-        Cliente clienteAtualizado = clienteOptional.get();
-        clienteAtualizado.setNome(cliente.getNome());
-        clienteAtualizado.setEmail(cliente.getEmail());
-        clienteAtualizado.setTelefone(cliente.getTelefone());
-        clienteAtualizado.setCpf(cliente.getCpf());
-        clienteAtualizado.setCidade(cliente.getCidade());
-        clienteAtualizado.setDataEntrada(cliente.getDataEntrada());
-        clienteAtualizado.setDataSaida(cliente.getDataSaida());
-        return clienteRepository.save(clienteAtualizado);
+        Cliente clienteEditado = clienteOptional.get();
+
+        if(cliente.getNome() != null){
+            clienteEditado.setNome(cliente.getNome());
+        }
+
+        if(cliente.getCidade() != null){
+            clienteEditado.setCidade(cliente.getCidade());
+        }
+
+        if(cliente.getTelefone() != null){
+            clienteEditado.setTelefone(cliente.getTelefone());
+        }
+
+        if(cliente.getEmail() != null){
+            clienteEditado.setEmail(cliente.getEmail());
+        }
+
+        if(cliente.getCpf() != null){
+            clienteEditado.setCpf(cliente.getCpf());
+        }
+
+        return  clienteRepository.save(clienteEditado);
     }
 }
