@@ -21,6 +21,6 @@ public class Cabanas {
     @Column(nullable = false)
     private StatusCabana statusCabana;
 
-    @OneToMany(mappedBy = "cabana")
+    @OneToMany(mappedBy = "cabana", fetch = FetchType.EAGER)
     private List<Reserva> reservas;
 }

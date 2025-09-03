@@ -9,6 +9,7 @@ import com.cabanasmakai.app.domain.Reserva;
 import com.cabanasmakai.app.domain.enums.StatusCabana;
 import com.cabanasmakai.app.domain.enums.StatusReserva;
 import com.cabanasmakai.app.exceptions.*;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +55,10 @@ public class CabanaService {
         return cabanaRepository.save(cabanaEditada);
     }
 
+    public Cabanas verificarStatusCabana(Long id){
+        Cabanas cabana = cabanaRepository.findById(id).orElseThrow(()->new CabanaNaoEncontradaException(id));
+    }
+
     @Transactional
     public void excluirCabana(Long id) {
         if (reservaRepository.existsByCabanaIdAndStatus(id, StatusReserva.ATIVA)) {
@@ -62,7 +67,6 @@ public class CabanaService {
         cabanaRepository.deleteById(id);
     }
 
-    @Transactional
     public Cabanas reservarCabana(Long cabanaId, Long clienteId, LocalDate dataEntrada, LocalDate dataSaida) {
         Cabanas cabana = cabanaRepository.findById(cabanaId)
                 .orElseThrow(() -> new CabanaNaoEncontradaException(cabanaId));
@@ -88,7 +92,6 @@ public class CabanaService {
         return cabana;
     }
 
-    @Transactional
     public Cabanas liberaCabana(Long cabanaId) {
         Cabanas cabana = cabanaRepository.findById(cabanaId)
                 .orElseThrow(() -> new CabanaNaoEncontradaException(cabanaId));
@@ -114,5 +117,21 @@ public class CabanaService {
 
     public Cabanas listarCabanaId(Long id) {
         return cabanaRepository.findById(id).orElseThrow(() -> new CabanaNaoEncontradaException(id));
+    }
+
+    @Scheduled(fixedRate = 3600000)
+    public void verificarReservasFinalizadas() {
+        List<Cabanas> cabanas = cabanaRepository.findAll();
+
+        for (Cabanas cabana : cabanas){
+            for(Reserva reserva : cabana.getReservas()){
+                if(reserva.getStatus() == StatusReserva.ATIVA && reserva.getDataSaida().isBefore(LocalDate.now())){
+                    reserva.setStatus(StatusReserva.FINALIZADA);
+                    reservaRepository.save(reserva);
+                    cabana.setStatusCabana(StatusCabana.DISPONIVEL);
+                    cabanaRepository.save(cabana);
+                }
+            }
+        }
     }
 }

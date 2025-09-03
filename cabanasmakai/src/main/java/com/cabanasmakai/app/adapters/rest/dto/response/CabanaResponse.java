@@ -11,5 +11,5 @@ public class CabanaResponse {
     private Long id;
     private String numeroCabana;
     private StatusCabana statusCabana;
-    private List<Reserva> reservas;
+    private List<ReservaResponse> reservas;
 }
