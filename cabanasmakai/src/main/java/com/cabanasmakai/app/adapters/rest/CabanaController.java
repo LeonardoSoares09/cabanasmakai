@@ -5,6 +5,7 @@ import com.cabanasmakai.app.adapters.rest.dto.response.CabanaResponse;
 import com.cabanasmakai.app.adapters.rest.mapper.CabanaMapper;
 import com.cabanasmakai.app.application.CabanaService;
 import com.cabanasmakai.app.domain.Cabanas;
+import com.cabanasmakai.app.domain.enums.StatusCabana;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -82,5 +83,9 @@ public class CabanaController {
         return ResponseEntity.ok(cabanaMapper.toDto(cabana));
     }
 
-
+    @GetMapping("/verifica-status")
+    public ResponseEntity<StatusCabana> verificaStatus(@RequestParam Long id){
+        StatusCabana sc = cabanaService.verificarStatusCabana(id);
+        return  ResponseEntity.ok(sc);
+    }
 }

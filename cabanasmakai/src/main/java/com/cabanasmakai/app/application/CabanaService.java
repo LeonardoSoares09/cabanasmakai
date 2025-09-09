@@ -55,8 +55,9 @@ public class CabanaService {
         return cabanaRepository.save(cabanaEditada);
     }
 
-    public Cabanas verificarStatusCabana(Long id){
+    public StatusCabana verificarStatusCabana(Long id){
         Cabanas cabana = cabanaRepository.findById(id).orElseThrow(()->new CabanaNaoEncontradaException(id));
+        return cabana.getStatusCabana();
     }
 
     @Transactional
@@ -119,7 +120,7 @@ public class CabanaService {
         return cabanaRepository.findById(id).orElseThrow(() -> new CabanaNaoEncontradaException(id));
     }
 
-    @Scheduled(fixedRate = 3600000)
+    @Scheduled(cron = "0 0 13 * * ?", zone = "America/Sao_Paulo")
     public void verificarReservasFinalizadas() {
         List<Cabanas> cabanas = cabanaRepository.findAll();
 
